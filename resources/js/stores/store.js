@@ -4,6 +4,7 @@ import Vuex from "vuex";
 import User from "./modules/user"
 import Snackbar from "./modules/snackbar"
 import Loader from "./modules/loader"
+import Author from "./modules/author"
 import createPersistedState from "vuex-persistedstate"
 Vue.use(Vuex);
 
@@ -12,6 +13,7 @@ const store = new Vuex.Store({
         User,
         Snackbar,
         Loader,
+        Author
     },
     plugins: [createPersistedState()],
 });

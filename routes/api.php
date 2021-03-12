@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\QuestionController;
-use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\AuthorController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,7 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-    Route::post('logout', 'AuthController@logout');
+    Route::post('logout', [AuthController::class,'logout']);
     Route::post('/auth/login', [AuthController::class,'login']);
     Route::post('/auth/register', [AuthController::class,'register']);
     Route::post('/me', [AuthController::class,'me']);
+    Route::apiResource('/authors', AuthorController::class);

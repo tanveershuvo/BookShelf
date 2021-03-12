@@ -4,7 +4,9 @@ export default {
     },
     mutations:{
         SET_SNACKBAR:(state, payload)=>{
-            state.snackbar = payload;
+            state.snackbar.text = payload.msg
+            state.snackbar.color = payload.type
+            state.snackbar.showing = true
         },
     },
     getters:{
