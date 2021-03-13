@@ -31,7 +31,7 @@
                         </v-btn>
                     </template>
                     <ValidationObserver ref="observer" v-slot="{ validate, handleSubmit }">
-                        <v-form @submit.prevent="handleSubmit(save)">
+                        <v-form ref="form" @submit.prevent="handleSubmit(save)">
                     <v-card>
 
                         <v-card-title>
@@ -200,9 +200,10 @@ export default {
             this.dialog = false
             this.$nextTick(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
+                this.$refs.observer.reset();
                 this.isEdit = 0
             })
-            this.errors.clear();
+
 
         },
 
