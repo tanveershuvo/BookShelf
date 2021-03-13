@@ -67,32 +67,20 @@ export default {
                             return Promise.reject(msg = 'Bad Request!');
                         }
                     })
-                    .catch(error => {
-                        if(msg){
-                            reject(error)
-                        }else{
-                            reject(error.response.data.err)
-                        }
-                    });
+
             });
         },
         REGISTER: ({dispatch,commit}, payload) => {
             return new Promise((resolve, reject) => {
-                let msg;
                 axios
                     .post('/auth/register', payload)
                     .then(({data, status}) => {
                         if (status === 200) {
+                            dispatch('SNACKBAR',data)
                             resolve(true);
                         }
                     })
-                    .catch(error => {
-                        if(msg){
-                            reject(error)
-                        }else{
-                            reject(error.response)
-                        }
-                    });
+
             });
         },
         LOGOUT: ({commit}) => {

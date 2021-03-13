@@ -5,9 +5,9 @@ namespace App\Exceptions;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -74,16 +74,17 @@ class Handler extends ExceptionHandler
         }elseif($exception instanceof TokenExpiredException){
             return response(['message'=>'[CODE - 400] token is expired, request a new one.']);
         }elseif($exception instanceof JWTException){
-            return response(['msg'=>'[CODE - 400] token is not provided.','type'=>'red']);
+            return response(['msg'=>'Unexpected[CODE - 400] token is not provided.','type'=>'red']);
         }elseif ($exception instanceof MethodNotAllowedHttpException) {
-            return response(['msg'=>'[CODE - 405]  The specified method for the request is invalid','type'=>'red']);
+            return response(['msg'=>'[CODE - 405]  The specified method for the request is invalid','type'=>'red'],405);
         }elseif ($exception instanceof NotFoundHttpException) {
             return response(['msg'=>'[CODE - 404]   The specified URL cannot be found','type'=>'red']);
         }elseif ($exception instanceof HttpException) {
             return response(['msg'=>'[CODE - '.$exception->getStatusCode().']'.$exception->getMessage(),'type'=>'red']);
+        }elseif ($exception instanceof ValidationException) {
+            return response(['msg'=>$exception->errors(),'type'=>'red'],422);
         }elseif (config('app.debug')) {
             return parent::render($request, $exception);
         }
-        return response(['msg'=>'[CODE - 500] Unexpected Exception. Try later','type'=>'red']);
     }
 }

@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-    Route::post('logout', [AuthController::class,'logout']);
+
     Route::post('/auth/login', [AuthController::class,'login']);
     Route::post('/auth/register', [AuthController::class,'register']);
-    Route::post('/me', [AuthController::class,'me']);
-    Route::apiResource('/authors', AuthorController::class);
+        Route::post('logout', [AuthController::class,'logout']);
+        Route::apiResource('/authors', AuthorController::class);

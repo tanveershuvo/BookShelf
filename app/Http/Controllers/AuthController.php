@@ -3,101 +3,79 @@
 namespace App\Http\Controllers;
 
 
+use App\Http\Requests\AuthorStoreRequest;
 use App\Models\User;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
+
     public function __construct()
     {
         $this->middleware('JwtMiddleware', ['except' => ['login','register']]);
     }
 
     /**
-     * Get a JWT via given credentials.
-     *
-     * @return JsonResponse
+     * @return Application|ResponseFactory|Response
      */
     public function login()
     {
         $credentials = request(['email', 'password']);
 
         if (! $token = auth('api')->attempt($credentials)) {
-            return response()->json(['err' => 'Credential Mismatched'], Response::HTTP_UNAUTHORIZED);
+            return response(['msg' => 'Credential Mismatched','type'=>'red'], Response::HTTP_UNAUTHORIZED);
         }
 
         return $this->respondWithToken($token);
     }
 
-
-    public function register(Request $request)
-    {
-        $user = User::create([
-           'email'=>$request->email,
-           'name'=>$request->name,
-           'password'=> Hash::make($request->password)
-           ]);
-        if($user){
-            return response()->json(['status'=>false,'data'=>'User Cretaed Succesfully']);
-        } else {
-            return response()->json(['status'=>false,'data'=>null]);
-        }
-
-    }
-
     /**
-     * Get the authenticated User.
-     *
-     * @return JsonResponse
+     * @param AuthorStoreRequest $request
+     * @return Application|ResponseFactory|Response
      */
-    public function me()
+    public function register(AuthorStoreRequest $request)
     {
-        return response()->json(auth('api')->user());
+        try{
+            User::create([
+               'email'=>$request->email,
+               'name'=>$request->name,
+               'password'=> Hash::make($request->password)
+            ]);
+            return response(['msg' => 'User Created Successfully! Please Login Now!','type'=>'success'], Response::HTTP_OK);
+        }catch (\Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red'],$e->getCode());
+        }
     }
 
     /**
-     * Log the user out (Invalidate the token).
-     *
-     * @return JsonResponse
+     * @return Application|ResponseFactory|Response
      */
     public function logout()
     {
         auth('api')->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response();
     }
 
+
     /**
-     * Refresh a token.
-     *
-     * @return JsonResponse
+     * @return Application|ResponseFactory|Response
      */
     public function refresh()
     {
         return $this->respondWithToken(auth()->refresh());
     }
 
+
     /**
-     * Get the token array structure.
-     *
      * @param string $token
-     *
-     * @return JsonResponse
+     * @return Application|ResponseFactory|Response
      */
     protected function respondWithToken(string $token)
     {
-        return response()->json([
+        return response([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 1,

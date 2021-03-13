@@ -216,7 +216,7 @@ export default {
         },
         save(){
             if (this.isEdit === 0) {
-                this.$store.dispatch("ADD_AUTHOR", this.editedItem).then(success => {
+                this.$store.dispatch("ADD_AUTHOR", {name:this.editedItem.name,email:this.editedItem.email}).then(success => {
                     this.close()
                 })
             }else{
@@ -233,48 +233,10 @@ export default {
         },
     },
     mounted(){
-        this.ALL_AUTHORS
+        this.$store.dispatch('ALL_AUTHORS');
     }
 }
 </script>
-
-<!--<script>-->
-<!--import {mapGetters,mapActions} from 'vuex'-->
-
-
-
-
-<!--export default {-->
-<!--    data () {-->
-<!--        return {-->
-<!--            search: '',-->
-<!--            headers: [-->
-<!--                {-->
-<!--                    text: 'No.',-->
-<!--                    align: 'start',-->
-<!--                    filterable: false,-->
-<!--                    value: 'id',-->
-<!--                },-->
-<!--                { text: 'Authors', value: 'name' },-->
-<!--                { text: 'E-mail', value: 'email' },-->
-<!--                { text: 'Action', value: 'action' },-->
-<!--            ],-->
-<!--        }-->
-<!--    },-->
-<!--    methods:{-->
-<!--        ...mapActions(['ALL_AUTHORS']),-->
-<!--    },-->
-    computed:{
-    ...mapGetters({
-            authors: 'GET_ALL_AUTHORS',
-        }),
-    },
-    mounted(){
-        this.ALL_AUTHORS
-    }
-<!--}-->
-<!--</script>-->
-
 <style scoped>
 
 </style>

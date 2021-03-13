@@ -15,11 +15,24 @@
                     <h1 class="pt-4 text-center">Log In Form</h1>
                     <v-row class="px-4">
                         <v-col cols="12">
-                            <div v-if="error" >
-                                <v-alert type="error">
-                                    {{ error }}
-                                </v-alert>
-                            </div>
+                            <v-snackbar
+                                v-model="snackbar.showing"
+                                :bottom="true"
+                                :right="true"
+                                :color="snackbar.color"
+                            >
+                                {{ snackbar.text }}
+                                <template v-slot:action="{ attrs }">
+                                    <v-btn
+                                        dark
+                                        text
+                                        v-bind="attrs"
+                                        @click="close"
+                                    >
+                                        Close
+                                    </v-btn>
+                                </template>
+                            </v-snackbar>
                             <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                                 <v-text-field
                                     v-model="form.email"
@@ -99,6 +112,11 @@ export default {
         error: '',
         success: '',
     }),
+    computed: {
+        ...mapGetters({
+            snackbar:'GET_SNACKBAR'
+        }),
+    },
     methods: {
          login() {
              this.loader = true;
@@ -112,6 +130,9 @@ export default {
         },
         registerPage(){
             this.$router.push({name:'Registration'})
+        },
+        close(){
+            this.$store.dispatch("RESET_SNACKBAR")
         }
     },
 };

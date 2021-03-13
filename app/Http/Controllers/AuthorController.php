@@ -2,15 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AuthorStoreRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AuthorController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('JwtMiddleware');
+    }
+
     /**
      * @return Application|ResponseFactory|Response
      */
@@ -20,35 +25,38 @@ class AuthorController extends Controller
             $authors = User::where('usertype',2)->get();
             return response($authors);
         }catch (Exception $e) {
-            return response(['msg' => $e->getMessage(),'type' => 'red']);
+            return response(['msg' => $e->getMessage(),'type' => 'red'],$e->getCode());
         }
     }
 
+
     /**
-     * @param Request $request
+     * @param AuthorStoreRequest $request
      * @return Application|ResponseFactory|Response
      */
-    public function store(Request $request)
+    public function store(AuthorStoreRequest $request)
     {
         try{
             User::create([
-                'name'=>$request->data['name'],
-                'email'=>$request->data['email'],
+                'name'=>$request->name,
+                'email'=>$request->email,
                 'password'=>bcrypt('123456'),
                 'usertype'=>2,
             ]);
             return response(['msg'=>'Authors Added','type'=>'success']);
-        }catch (Exception $e) {
-            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }catch (\Exception $e) {
+             return response(['msg' => $e->getMessage(),'type' => 'red'],$e->getCode());
         }
+
     }
 
+
     /**
-     * @param Request $request
+     * @param AuthorStoreRequest $request
      * @param $id
      * @return Application|ResponseFactory|Response
      */
-    public function update(Request $request, $id)
+    public function update(AuthorStoreRequest $request, $id)
     {
         try{
             User::find($id)->update([
@@ -58,10 +66,11 @@ class AuthorController extends Controller
                 'usertype'=>2,
             ]);
             return response(['msg'=>'Authors Edited','type'=>'info']);
-        }catch (Exception $e) {
-            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }catch (\Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red'],$e->getCode());
         }
     }
+
 
     /**
      * @param $id

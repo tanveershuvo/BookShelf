@@ -21,6 +21,7 @@ export default {
     },
     actions:{
         SNACKBAR:({commit},payload)=>{
+            console.log(payload)
             commit('SET_SNACKBAR',payload)
             setTimeout(() => commit('SET_NULL_SNACKBAR'), 5000)
         },

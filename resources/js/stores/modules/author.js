@@ -25,24 +25,18 @@ export default {
                             resolve(true)
                         }
                     })
-                    .catch(error => {
-                        reject(error)
-                    })
             });
         },
         ADD_AUTHOR: ({dispatch,commit}, data) => {
             return new Promise((resolve, reject) => {
                 axios
-                    .post('/authors',{data})
+                    .post('/authors',data)
                     .then(({data, status}) => {
                         if (status === 200) {
                             dispatch('ALL_AUTHORS')
                             dispatch('SNACKBAR',data)
                             resolve(true)
                         }
-                    })
-                    .catch(error => {
-                        reject(error)
                     })
             });
         },
