@@ -17,7 +17,6 @@ export default {
     actions: {
         ALL_AUTHORS: ({dispatch,commit}, payload) => {
             return new Promise((resolve, reject) => {
-                let msg;
                 axios
                     .get('/authors')
                     .then(({data, status}) => {
@@ -33,12 +32,10 @@ export default {
         },
         ADD_AUTHOR: ({dispatch,commit}, data) => {
             return new Promise((resolve, reject) => {
-                let msg;
                 axios
                     .post('/authors',{data})
                     .then(({data, status}) => {
                         if (status === 200) {
-                            console.log(data)
                             dispatch('ALL_AUTHORS')
                             dispatch('SNACKBAR',data)
                             resolve(true)
@@ -48,7 +45,39 @@ export default {
                         reject(error)
                     })
             });
-        }
+        },
+        UPDATE_AUTHOR: ({dispatch,commit}, data) => {
+            return new Promise((resolve, reject) => {
+                axios
+                    .put('/authors/'+data.id,{data})
+                    .then(({data, status}) => {
+                        if (status === 200) {
+                            dispatch('ALL_AUTHORS')
+                            dispatch('SNACKBAR',data)
+                            resolve(true)
+                        }
+                    })
+                    .catch(error => {
+                        reject(error)
+                    })
+            });
+        },
+        DELETE_AUTHOR: ({dispatch,commit}, id) => {
+            return new Promise((resolve, reject) => {
+                axios
+                    .delete('/authors/'+ id)
+                    .then(({data, status}) => {
+                        if (status === 200) {
+                            dispatch('ALL_AUTHORS')
+                            dispatch('SNACKBAR',data)
+                            resolve(true)
+                        }
+                    })
+                    .catch(error => {
+                        reject(error)
+                    })
+            });
+        },
 
     }
 }

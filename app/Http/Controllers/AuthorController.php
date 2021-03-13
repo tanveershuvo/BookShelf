@@ -3,77 +3,77 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AuthorController extends Controller
 {
-
+    /**
+     * @return Application|ResponseFactory|Response
+     */
     public function index()
     {
-        $authors = User::where('usertype',2)->get();
-        return response($authors);
+        try{
+            $authors = User::where('usertype',2)->get();
+            return response($authors);
+        }catch (Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }
     }
 
-
-    public function create(Request $request)
-    {
-    }
-
-
+    /**
+     * @param Request $request
+     * @return Application|ResponseFactory|Response
+     */
     public function store(Request $request)
     {
-        User::create([
-            'name'=>$request->data['name'],
-            'email'=>$request->data['email'],
-            'password'=>bcrypt('123456'),
-            'usertype'=>2,
-        ]);
-        return response(['msg'=>'Authors Added','type'=>'success']);
-
+        try{
+            User::create([
+                'name'=>$request->data['name'],
+                'email'=>$request->data['email'],
+                'password'=>bcrypt('123456'),
+                'usertype'=>2,
+            ]);
+            return response(['msg'=>'Authors Added','type'=>'success']);
+        }catch (Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param $id
+     * @return Application|ResponseFactory|Response
      */
     public function update(Request $request, $id)
     {
-        //
+        try{
+            User::find($id)->update([
+                'name'=>$request->data['name'],
+                'email'=>$request->data['email'],
+                'password'=>bcrypt('123456'),
+                'usertype'=>2,
+            ]);
+            return response(['msg'=>'Authors Edited','type'=>'info']);
+        }catch (Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return Application|ResponseFactory|Response
      */
     public function destroy($id)
     {
-        //
+        try {
+            User::destroy($id);
+            return response(['msg'=>'Authors Deleted','type'=>'red']);
+        }catch (Exception $e) {
+            return response(['msg' => $e->getMessage(),'type' => 'red']);
+        }
     }
 }

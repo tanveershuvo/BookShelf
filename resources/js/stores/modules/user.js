@@ -98,7 +98,10 @@ export default {
         LOGOUT: ({commit}) => {
             commit("SET_TOKEN", '');
             commit("SET_USER_NAME", '');
+            commit("SET_USER_TYPE", '');
             commit("SET_IS_LOGGED_IN", false);
+            window.localStorage.clear();
+            window.sessionStorage.clear();
             return true;
         },
 

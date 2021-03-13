@@ -2,7 +2,7 @@
     <v-data-table
         :headers="headers"
         :items="authors"
-        sort-by="calories"
+        sort-by="name"
         class="elevation-1"
     >
         <template v-slot:top>
@@ -20,18 +20,20 @@
                     v-model="dialog"
                     max-width="500px"
                 >
-                    <template v-slot:activator="{ on, attrs }">
+                    <template v-slot:activator="{ on }">
                         <v-btn
                             color="primary"
                             dark
                             class="mb-2"
-                            v-bind="attrs"
                             v-on="on"
                         >
-                            New Item
+                            Add New Author
                         </v-btn>
                     </template>
+                    <ValidationObserver ref="observer" v-slot="{ validate, handleSubmit }">
+                        <v-form @submit.prevent="handleSubmit(save)">
                     <v-card>
+
                         <v-card-title>
                             <span class="headline">{{ formTitle }}</span>
                         </v-card-title>
@@ -42,18 +44,24 @@
                                     <v-col
                                         cols="12"
                                     >
+                                        <ValidationProvider v-slot="{ errors }" name="name" rules="required">
                                         <v-text-field
                                             v-model="editedItem.name"
-                                            label="Dessert name"
+                                            label="Author name"
+                                            :error-messages="errors"
                                         ></v-text-field>
+                                        </ValidationProvider>
                                     </v-col>
                                     <v-col
                                         cols="12"
                                     >
+                                        <ValidationProvider v-slot="{ errors }" name="email" rules="required|email">
                                         <v-text-field
                                             v-model="editedItem.email"
-                                            label="Calories"
+                                            label="Email"
+                                            :error-messages="errors"
                                         ></v-text-field>
+                                        </ValidationProvider>
                                     </v-col>
                                 </v-row>
                             </v-container>
@@ -71,12 +79,15 @@
                             <v-btn
                                 color="blue darken-1"
                                 text
-                                @click="save"
+                                type="submit"
                             >
                                 Save
                             </v-btn>
                         </v-card-actions>
+
                     </v-card>
+                        </v-form>
+                    </ValidationObserver>
                 </v-dialog>
                 <v-dialog v-model="dialogDelete" max-width="500px">
                     <v-card>
@@ -91,9 +102,10 @@
                 </v-dialog>
             </v-toolbar>
         </template>
-        <template v-slot:item.actions="{ item }">
+            <template v-slot:item.actions="{ item }">
             <v-icon
                 small
+                color="primary"
                 class="mr-2"
                 @click="editItem(item)"
             >
@@ -101,25 +113,35 @@
             </v-icon>
             <v-icon
                 small
+                color="red"
                 @click="deleteItem(item)"
             >
                 mdi-delete
             </v-icon>
         </template>
-        <template v-slot:no-data>
-            <v-btn
-                color="primary"
-                @click="initialize"
-            >
-                Reset
-            </v-btn>
-        </template>
     </v-data-table>
 </template>
 
 <script>
+import {required, email} from 'vee-validate/dist/rules'
+import { extend, ValidationObserver, ValidationProvider, setInteractionMode } from 'vee-validate'
 import {mapGetters,mapActions} from 'vuex'
+setInteractionMode("eager");
+
+extend("required", {
+    ...required,
+    message: "{_field_} can not be empty",
+});
+extend("email", {
+    ...email,
+    message: "Email must be valid",
+});
+
 export default {
+    components: {
+        ValidationProvider,
+        ValidationObserver,
+    },
     data: () => ({
         dialog: false,
         dialogDelete: false,
@@ -132,8 +154,7 @@ export default {
             { text: 'Email', value: 'email' },
             { text: 'Actions', value: 'actions', sortable: false },
         ],
-        desserts: [],
-        editedIndex: -1,
+        isEdit: 0,
         editedItem: {
             name: '',
             email:''
@@ -148,8 +169,9 @@ export default {
         ...mapGetters({
             authors: 'GET_ALL_AUTHORS',
         }),
+
         formTitle () {
-            return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
+            return this.isEdit === 0 ? 'New Author' : 'Edit Author'
         },
     },
 
@@ -164,44 +186,49 @@ export default {
     methods: {
 
         editItem (item) {
-            this.editedIndex = this.authors.id
+            this.isEdit = 1
             this.editedItem = Object.assign({}, item)
             this.dialog = true
         },
 
         deleteItem (item) {
-            this.editedIndex = this.authors.id
-            console.log(item)
             this.editedItem = Object.assign({}, item)
             this.dialogDelete = true
-        },
-
-        deleteItemConfirm () {
-            // this.desserts.splice(this.editedIndex, 1)
-            this.closeDelete()
         },
 
         close () {
             this.dialog = false
             this.$nextTick(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
+                this.isEdit = 0
             })
+            this.errors.clear();
+
         },
 
         closeDelete () {
             this.dialogDelete = false
             this.$nextTick(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
+                this.isEdit = 0
             })
         },
-        ...mapActions(['ADD_AUTHOR','ALL_AUTHORS']),
-                save(){
-                this.$store.dispatch("ADD_AUTHOR",this.editedItem).then(success => {
+        save(){
+            if (this.isEdit === 0) {
+                this.$store.dispatch("ADD_AUTHOR", this.editedItem).then(success => {
                     this.close()
-                }).then(success=>{
                 })
+            }else{
+                this.$store.dispatch("UPDATE_AUTHOR",this.editedItem).then(success => {
+                    this.close()
+                })
+            }
+        },
+        deleteItemConfirm () {
+            this.$store.dispatch("DELETE_AUTHOR", this.editedItem.id).then(success => {
+                this.close()
+            })
+            this.closeDelete()
         },
     },
     mounted(){

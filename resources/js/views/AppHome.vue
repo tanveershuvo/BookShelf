@@ -7,7 +7,6 @@
                     v-model="snackbar.showing"
                     :bottom="true"
                     :right="true"
-                    :timeout="5000"
                     :color="snackbar.color"
                 >
                     {{ snackbar.text }}
@@ -16,7 +15,7 @@
                             dark
                             text
                             v-bind="attrs"
-                            @click="snackbar.showing = false"
+                            @click="close"
                         >
                             Close
                         </v-btn>
@@ -45,20 +44,17 @@ import snackbar from "../stores/modules/snackbar";
 import Overlay from './overlay'
 export default {
     components:{AppFooter,Navbar,Loading,Overlay},
-    data:()=>({
-        // snackbar: {showing:false,text:'',color:''},
-    }),
+
     computed: {
         ...mapGetters({
             isLoggedIn: 'IS_LOGGED_IN',
+            snackbar:'GET_SNACKBAR'
         }),
-        snackbar:function(){
-            return this.$store.getters.GET_SNACKBAR
-        },
-
     },
-    created() {
-
+    methods:{
+        close(){
+            this.$store.dispatch("RESET_SNACKBAR")
+        }
     }
 }
 </script>

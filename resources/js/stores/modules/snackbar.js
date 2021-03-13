@@ -8,6 +8,11 @@ export default {
             state.snackbar.color = payload.type
             state.snackbar.showing = true
         },
+        SET_NULL_SNACKBAR:(state,)=>{
+            state.snackbar.text = ''
+            state.snackbar.color = ''
+            state.snackbar.showing = false
+        },
     },
     getters:{
         GET_SNACKBAR: state => {
@@ -16,8 +21,11 @@ export default {
     },
     actions:{
         SNACKBAR:({commit},payload)=>{
-            //console.log(payload)
             commit('SET_SNACKBAR',payload)
+            setTimeout(() => commit('SET_NULL_SNACKBAR'), 5000)
+        },
+        RESET_SNACKBAR:({commit})=>{
+            commit('SET_NULL_SNACKBAR')
         }
     }
 }

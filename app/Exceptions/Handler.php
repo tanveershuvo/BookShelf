@@ -8,6 +8,9 @@ use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
@@ -65,18 +68,22 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if($exception instanceof TokenBlacklistedException){
-            return response(['message'=>'token is blacklisted, request new token.'],
-                Response::HTTP_BAD_REQUEST);
+            return response(['message'=>'CODE ['.Response::HTTP_BAD_REQUEST.'] - token is blacklisted, request new token.']);
         }elseif($exception instanceof TokenInvalidException){
-            return response(['message'=>'token is invalid.'],
-                Response::HTTP_BAD_REQUEST);
+            return response(['message'=>'[CODE - 400] token is invalid.']);
         }elseif($exception instanceof TokenExpiredException){
-            return response(['message'=>'token is expired, request a new one.'],
-                Response::HTTP_BAD_REQUEST);
+            return response(['message'=>'[CODE - 400] token is expired, request a new one.']);
         }elseif($exception instanceof JWTException){
-            return response(['message'=>'token is not provided.'],
-                Response::HTTP_BAD_REQUEST);
+            return response(['msg'=>'[CODE - 400] token is not provided.','type'=>'red']);
+        }elseif ($exception instanceof MethodNotAllowedHttpException) {
+            return response(['msg'=>'[CODE - 405]  The specified method for the request is invalid','type'=>'red']);
+        }elseif ($exception instanceof NotFoundHttpException) {
+            return response(['msg'=>'[CODE - 404]   The specified URL cannot be found','type'=>'red']);
+        }elseif ($exception instanceof HttpException) {
+            return response(['msg'=>'[CODE - '.$exception->getStatusCode().']'.$exception->getMessage(),'type'=>'red']);
+        }elseif (config('app.debug')) {
+            return parent::render($request, $exception);
         }
-        return parent::render($request, $exception);
+        return response(['msg'=>'[CODE - 500] Unexpected Exception. Try later','type'=>'red']);
     }
 }
