@@ -23,9 +23,10 @@ class AuthorStoreRequest extends FormRequest
      */
     public function rules()
     {
+        $id = !empty($this->id) ? $this->id : '';
         return [
             'name' => 'required|string|max:50',
-            'email' => 'required|string|email|max:150|unique:users',
+            'email' => "required|string|email|max:150|unique:users,email,$id,id"
         ];
     }
 

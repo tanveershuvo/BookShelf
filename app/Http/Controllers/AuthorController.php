@@ -7,6 +7,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class AuthorController extends Controller
@@ -56,14 +57,13 @@ class AuthorController extends Controller
      * @param $id
      * @return Application|ResponseFactory|Response
      */
+
     public function update(AuthorStoreRequest $request, $id)
     {
         try{
             User::find($id)->update([
-                'name'=>$request->data['name'],
-                'email'=>$request->data['email'],
-                'password'=>bcrypt('123456'),
-                'usertype'=>2,
+                'name'=>$request->name,
+                'email'=>$request->email,
             ]);
             return response(['msg'=>'Authors Edited','type'=>'info']);
         }catch (\Exception $e) {
