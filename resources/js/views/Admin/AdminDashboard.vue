@@ -216,7 +216,8 @@ export default {
         },
         save(){
             if (this.isEdit === 0) {
-                this.$store.dispatch("ADD_AUTHOR", {name:this.editedItem.name,email:this.editedItem.email}).then(success => {
+                this.$store.dispatch("ADD_AUTHOR", this.editedItem).then(success => {
+
                     this.close()
                 })
             }else{

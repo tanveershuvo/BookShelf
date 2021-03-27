@@ -43,7 +43,7 @@ export default {
         UPDATE_AUTHOR: ({dispatch,commit}, data) => {
             return new Promise((resolve, reject) => {
                 axios
-                    .put('/authors/'+data.id,{data})
+                    .put('/authors/'+data.id,data)
                     .then(({data, status}) => {
                         if (status === 200) {
                             dispatch('ALL_AUTHORS')
